@@ -11,7 +11,7 @@ void* th_fn(void *arg) {
     int time = (int)(drand48() * 100000);
     usleep(time);
   }
-  return (void*)0;
+  return (void*)0;   // 等价  pthread_exit((void*)0);
 }
 
 int main() {
@@ -31,9 +31,10 @@ int main() {
     printf("pthread_create error\n");
     return -1;
   }
+ 
+  printf("main thread id %lx\n", pthread_self());
   pthread_join(rabbit, NULL);
   pthread_join(turble, NULL);
-  printf("main thread id %lx\n", pthread_self());
   printf("Finish!\n");
   return 0;
 }
