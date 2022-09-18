@@ -22,30 +22,32 @@ void *withdraw_fn(void *arg) {
 
   printf("%8s(Ox%lx) withdraw %f from account %d\n", oa->name, pthread_self(),
          amt, oa->account->code);
-  return (void*)0;
+  return (void *)0;
 }
 
 //定义取款操作函数
 void *deposit_fn(void *arg) {
-    OperArg *oa = (OperArg*)arg;
-    double amt = deposit(oa->account, oa->amt);
+  OperArg *oa = (OperArg *)arg;
+  double amt = deposit(oa->account, oa->amt);
 
-    printf("%8s(Ox%lx) deposit %f from account %d\n", oa->name, pthread_self(),
+  printf("%8s(Ox%lx) deposit %f from account %d\n", oa->name, pthread_self(),
          amt, oa->account->code);
-    return (void*)0;
+  return (void *)0;
 }
 
 //定义检查银行账户的线程运行函数
 void *check_fn(void *arg) {
-    return (void*)0;
+  OperArg *oa = (OperArg *)arg;
+  printf("check account balance %f\n", get_balance(oa->account));
+  return (void *)0;
 }
 
 int main() {
   int err;
-  pthread_t boy, girl;
+  pthread_t boy, girl, check_person;
   Account *a = create_account(50042353, 10000.0);
 
-  OperArg o1, o2;
+  OperArg o1, o2, o3;
   strcpy(o1.name, "boy");
   o1.account = a;
   o1.amt = 10000.0;
@@ -53,6 +55,10 @@ int main() {
   strcpy(o2.name, "girl");
   o2.account = a;
   o2.amt = 10000.0;
+
+  strcpy(o3.name, "check_person");
+  o3.account = a;
+  o3.amt = 10000.0;
 
   // 启动两个子线程（boy和girl线程）
   // 同时去操作同一个银行账户
@@ -66,8 +72,14 @@ int main() {
     return 0;
   }
 
+  if ((err = pthread_create(&check_person, NULL, check_fn, (void *)&o3))) {
+    printf("pthread_create error\n");
+    return 0;
+  }
+
   pthread_join(boy, NULL);
   pthread_join(girl, NULL);
+  pthread_join(check_person, NULL);
 
   printf("account balance %f\n", get_balance(a));
   return 0;

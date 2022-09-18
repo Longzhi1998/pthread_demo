@@ -9,7 +9,9 @@ typedef struct
 
     //定义互斥锁，用来对多线程共享资源加锁（保护）
     //一般不要把锁初始化为全局变量
-    pthread_mutex_t mutex;
+    // pthread_mutex_t mutex;
+    //定义读写锁
+    pthread_rwlock_t rwlock;
 }Account;
 
 /**
