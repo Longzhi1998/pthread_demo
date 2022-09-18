@@ -32,13 +32,14 @@ double withdraw(Account *a, double amt) {
     assert(a != NULL);
     // 加锁
     pthread_mutex_lock(&a->mutex);    // 共享资源操作的临界区
+    printf("real work!\n");
+    sleep(1);
     if (amt < 0 || amt > a->balance) {
         //解锁
         pthread_mutex_unlock(&a->mutex);
         return 0.0;
     }
     double balance = a->balance;
-    sleep(1);
     balance -= amt;
     a->balance = balance;
     // 解锁
