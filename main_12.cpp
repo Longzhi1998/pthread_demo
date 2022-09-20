@@ -28,9 +28,22 @@ void* th_fn(void* arg) {
   return (void*)0;
 }
 
+void* th_fn2(void *arg) {
+    pthread_t th1 = *(pthread_t*)arg;
+    for (int i = 1; i <= 9; i++) {
+        if (i%5 == 0) {
+            pthread_cancel(th1);
+            alarm(0); //取消定时器
+        }
+        printf("(%lx) i: %d\n", pthread_self(), i);
+        sleep(1);
+    }
+    return (void*)0;
+}
+
 int main() {
   int err;
-  pthread_t th;
+  pthread_t th, th2;
   pthread_attr_t attr;
   pthread_attr_init(&attr);
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
@@ -39,6 +52,19 @@ int main() {
     printf("pthread_create error\n");
     return 0;
   }
+
+  if ((err = pthread_create(&th2, &attr, th_fn2, (void*)&th)) != 0) {
+    printf("pthread_create error\n");
+    return 0;
+  }
+
+  // 屏蔽信号捕获
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set, SIGALRM);
+    pthread_sigmask(SIG_SETMASK, &set, NULL);
+
+
 
   while (1) {
     printf("control thread(%lx) is runnning...\n", pthread_self());
